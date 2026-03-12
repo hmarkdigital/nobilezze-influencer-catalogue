@@ -122,6 +122,26 @@
             transform: translateY(0);
         }
 
+        .enter-btn {
+            margin-top: 24px;
+            width: 280px;
+            background: transparent;
+            border: 1px solid var(--white);
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+
         /* ── WHITE OUT ─────────────────────────────────────────── */
         .fade-to-white {
             position: fixed;
@@ -138,12 +158,9 @@
         }
 
         @media (max-width: 768px) {
-            .logo {
-                width: 140px;
-            }
-            input[type="password"] {
-                width: 240px;
-            }
+            .logo { width: 140px; }
+            input[type="password"] { width: 240px; }
+            .enter-btn { width: 240px; }
         }
     </style>
 </head>
@@ -161,6 +178,7 @@
             <input type="password" id="pw" autocomplete="off" autofocus>
             <span class="instruction">KÉREM ADJA MEG A JELSZÓT</span>
             <div id="error" class="error-msg">Hibás a jelszó próbálja újra</div>
+            <button class="enter-btn" id="enterBtn">Belépés</button>
         </div>
     </div>
 
@@ -195,16 +213,20 @@
         });
 
         // Password logic
-        pwInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const val = pwInput.value.trim().toLowerCase();
-                if (val === 'nbc123') {
-                    startTransition();
-                } else {
-                    showError();
-                }
+        function checkPassword() {
+            const val = pwInput.value.trim().toLowerCase();
+            if (val === 'nbc123') {
+                startTransition();
+            } else {
+                showError();
             }
+        }
+
+        pwInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
         });
+
+        document.getElementById('enterBtn').addEventListener('click', checkPassword);
 
         function showError() {
             errorMsg.classList.add('visible');

@@ -962,6 +962,19 @@
             if (e.key === 'ArrowLeft') prevImg();
         });
 
+        // Touch swipe support for lightbox
+        let touchStartX = 0;
+        lb.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        lb.addEventListener('touchend', (e) => {
+            const delta = e.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(delta) < 40) return; // ignore tiny taps
+            if (delta < 0) nextImg();
+            else prevImg();
+        }, { passive: true });
+
         // Boot
         renderAll();
 
