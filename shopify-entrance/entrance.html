@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brand — Entry</title>
+
+    <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  AJTÓNYITÓS BELÉPÉSI MECHANIZMUS — SHOPIFY IMPLEMENTÁCIÓ    ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║                                                              ║
+    ║  HOGYAN MŰKÖDIK:                                             ║
+    ║  1. Az oldal betölt → V1 (ambient/loop) videó elindul       ║
+    ║  2. 0.5s után beúszik a logo + jelszó mező                  ║
+    ║  3. Helyes jelszó → overlay kifakul, V2 (átmeneti) elindul  ║
+    ║  4. V2 végén → fehérre fakul a képernyő                     ║
+    ║  5. Átirányítás a cél oldalra (pl. Shopify home)            ║
+    ║                                                              ║
+    ║  SHOPIFY-HOZ SZÜKSÉGES LÉPÉSEK:                             ║
+    ║  - A videókat töltsd fel a Shopify Files-ba (vagy CDN-re)   ║
+    ║  - A jelszót állítsd be a [JELSZÓ] helyén lentebb           ║
+    ║  - A cél URL-t állítsd be a [CÉL URL] helyén lentebb       ║
+    ║  - A logó képet cseréld le a saját logódra                  ║
+    ║  - Ezt a kódot Shopify-ban a password.liquid sablonba       ║
+    ║    vagy egy custom landing page section-be kell illeszteni  ║
+    ║                                                              ║
+    ╚══════════════════════════════════════════════════════════════╝
+    -->
+
+    <!-- Google Fonts — cserélhető a brand fontjára -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── VÁLTOZÓK — itt tudod a brand színeket beállítani ──── */
+        :root {
+            --black: #000000;
+            --white: #FFFFFF;
+            --grey: #B4B4B4;
+            --font-display: 'Cormorant Garamond', serif; /* display font */
+            --font-ui: 'DM Sans', sans-serif;            /* UI font */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* fontos: ne látszódjon scrollbar */
+            background-color: var(--black);
+            font-family: var(--font-ui);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── VIDEÓ HÁTTÉR ───────────────────────────────────────── */
+        .video-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
+
+        video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* kitölti a képernyőt, nem nyúlik el */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        video.active { opacity: 1; }
+
+        /* ── LOGO + JELSZÓ OVERLAY ──────────────────────────────── */
+        .entry-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1.5s ease; /* lassú beúszás = prémium hatás */
+        }
+
+        .logo {
+            width: 200px;
+            margin-bottom: 80px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Jelszó mező — átlátszó, fehér keret */
+        input[type="password"] {
+            width: 280px;
+            background: transparent;
+            border: 1px solid var(--white);
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 16px;
+            letter-spacing: 0.1em;
+            text-align: center;
+            padding: 14px 20px;
+            outline: none;
+        }
+
+        .instruction {
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--grey);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Hibaüzenet — alapból láthatatlan, .visible osztályra jelenik meg */
+        .error-msg {
+            height: 20px;
+            margin-top: 15px;
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 14px;
+            color: var(--white);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+
+        .error-msg.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Belépés gomb */
+        .enter-btn {
+            margin-top: 24px;
+            width: 280px;
+            background: transparent;
+            border: 1px solid var(--white);
+            color: var(--white);
+            font-family: var(--font-display);
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        /* ── FEHÉR ÁTTŰNÉS — az oldalváltás előtt ──────────────── */
+        /*
+         * Ez az elem kitakarja a képernyőt fehérrel, mielőtt
+         * az új oldalra navigál — így az átmenet zökkenőmentes.
+         * A céloldalon egy ugyanilyen fehér overlay-t kell
+         * kezdetben megjeleníteni, ami aztán kifakul.
+         */
+        .fade-to-white {
+            position: fixed;
+            inset: 0;
+            background-color: var(--white);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+
+        .fade-to-white.active { opacity: 1; }
+
+        /* ── RESZPONZÍV ─────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .logo { width: 140px; }
+            input[type="password"] { width: 240px; }
+            .enter-btn { width: 240px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VIDEÓ HÁTTÉR -->
+    <div class="video-container">
+        <!-- V1: Ambient/loop videó — addig megy, amíg a jelszót beírják -->
+        <video id="v1" playsinline muted preload="auto" class="active"></video>
+        <!-- V2: Átmeneti videó — helyes jelszó után játszódik le, majd fehérre fakul -->
+        <video id="v2" playsinline muted preload="auto" style="display: none;"></video>
+    </div>
+
+    <!-- LOGO + JELSZÓ MEZŐ -->
+    <div class="entry-overlay" id="overlay">
+
+        <!-- ▼ LOGÓ: cseréld le a Shopify-ba feltöltött logó URL-jére -->
+        <img src="LOGÓ_URL_IDE" alt="Brand Logo" class="logo">
+
+        <div class="input-group">
+            <input type="password" id="pw" autocomplete="off" autofocus placeholder="">
+            <span class="instruction">KÉREM ADJA MEG A JELSZÓT</span>
+            <div id="error" class="error-msg">Hibás jelszó, próbálja újra</div>
+            <button class="enter-btn" id="enterBtn">Belépés</button>
+        </div>
+    </div>
+
+    <!-- FEHÉR ÁTTŰNÉS RÉTEG -->
+    <div class="fade-to-white" id="whiteout"></div>
+
+
+    <script>
+        // ── BEÁLLÍTÁSOK — CSAK EZEKET KELL MÓDOSÍTANI ─────────────
+
+        const JELSZO = 'JELSZÓ_IDE';               // ← a belépési jelszó
+
+        const V1_URL = 'V1_VIDEÓ_URL_IDE';          // ← ambient/loop videó URL
+                                                    //   (Shopify Files-ból vagy CDN)
+
+        const V2_URL = 'V2_VIDEÓ_URL_IDE';          // ← átmeneti videó URL
+                                                    //   (ez játszódik le belépés után)
+
+        const CEL_URL = '/';                        // ← hova navigáljon belépés után
+                                                    //   pl. '/' = főoldal, '/collections/all' stb.
+
+        // ── LOGIKA — ezt nem szükséges módosítani ──────────────────
+
+        const v1      = document.getElementById('v1');
+        const v2      = document.getElementById('v2');
+        const pwInput = document.getElementById('pw');
+        const overlay = document.getElementById('overlay');
+        const errorEl = document.getElementById('error');
+        const whiteout = document.getElementById('whiteout');
+
+        // Videó URL-ek beállítása
+        v1.src = V1_URL;
+        v2.src = V2_URL;
+
+        // Oldal betöltése után V1 elindul, majd beúszik a logo + form
+        window.addEventListener('load', () => {
+            v1.play().catch(() => {}); // iOS silent autoplay
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 500);
+        });
+
+        // V1 végén megáll (nem loop — megáll az utolsó képkockán)
+        v1.addEventListener('ended', () => v1.pause());
+
+        // Jelszó ellenőrzés
+        function checkPassword() {
+            const val = pwInput.value.trim().toLowerCase();
+            if (val === JELSZO.toLowerCase()) {
+                startTransition();
+            } else {
+                showError();
+            }
+        }
+
+        pwInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+        document.getElementById('enterBtn').addEventListener('click', checkPassword);
+
+        function showError() {
+            errorEl.classList.add('visible');
+            pwInput.value = '';
+            setTimeout(() => errorEl.classList.remove('visible'), 2500);
+        }
+
+        // Az átmeneti animáció lépései:
+        // 1. Overlay kifakul (logo + form eltűnik)
+        // 2. V1 leáll, V2 elindul
+        // 3. V2 végén a képernyő fehérre fakul
+        // 4. Átirányítás a cél URL-re
+        function startTransition() {
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+
+            setTimeout(() => {
+                v1.style.display = 'none';
+                v2.style.display = 'block';
+                v2.style.opacity = '1';
+                v2.play().catch(() => {});
+
+                v2.addEventListener('ended', () => {
+                    whiteout.classList.add('active');
+                    setTimeout(() => {
+                        window.location.href = CEL_URL;
+                    }, 800);
+                }, { once: true });
+            }, 400);
+        }
+    </script>
+
+</body>
+</html>
