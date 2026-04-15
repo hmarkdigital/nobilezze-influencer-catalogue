@@ -236,6 +236,13 @@
             }, 2500);
         }
 
+        function goToKatalogus() {
+            whiteout.classList.add('active');
+            setTimeout(() => {
+                window.location.href = 'katalogus.html';
+            }, 800);
+        }
+
         function startTransition() {
             // 1. Fade out overlay
             overlay.style.opacity = '0';
@@ -246,17 +253,28 @@
                 v1.style.display = 'none';
                 v2.style.display = 'block';
                 v2.style.opacity = '1';
-                v2.play();
 
-                // 3. Listen for V2 end
-                v2.addEventListener('ended', () => {
-                    // 4. Fade to white
-                    whiteout.classList.add('active');
-                    setTimeout(() => {
-                        window.location.href = 'katalogus.html';
-                    }, 800);
+                // Fallback: ha a videó 10mp-en belül nem indul/végez, átirányítás
+                const fallback = setTimeout(goToKatalogus, 10000);
+
+                v2.addEventListener('error', () => {
+                    clearTimeout(fallback);
+                    goToKatalogus();
                 });
-            }, 400); // 0.4s fade out
+
+                v2.addEventListener('ended', () => {
+                    clearTimeout(fallback);
+                    goToKatalogus();
+                });
+
+                const playPromise = v2.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        clearTimeout(fallback);
+                        goToKatalogus();
+                    });
+                }
+            }, 400);
         }
     </script>
 </body>
