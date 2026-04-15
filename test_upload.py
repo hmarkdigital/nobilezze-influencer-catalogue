@@ -4,8 +4,8 @@ import requests
 import json
 import uuid
 
-SUPABASE_URL = "https://wpmjustqzuavqgxoezdz.supabase.co"
-API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwbWp1c3RxenVhdnFneG9lemR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwOTc3OTEsImV4cCI6MjA4ODY3Mzc5MX0.ky4rszpaCh1lxGKDv6D6H0Wtbyvmm6qjj7ml30o3Weo"
+SUPABASE_URL = "https://ppjvijirnkjuktlmqagx.supabase.co"
+API_KEY = "sb_publishable_e2ayINhTxgp6naZKv9N98w_bO36XvW1"
 BUCKET_NAME = "products"
 
 headers = {

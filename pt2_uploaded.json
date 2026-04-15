@@ -1,0 +1,83 @@
+[
+  {
+    "file": "Termékek_pt2/1-front (18).webp",
+    "id": "lamarthe-body-bag",
+    "brand": "LaMarthe",
+    "name": "Body Bag",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/f277b440_1-front_(18).webp"
+  },
+  {
+    "file": "Termékek_pt2/1-front (31).webp",
+    "id": "mk-hatizsak",
+    "brand": "Michael Kors",
+    "name": "Hátizsák",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/a697452b_1-front_(31).webp"
+  },
+  {
+    "file": "Termékek_pt2/1-front (42).webp",
+    "id": "mk-charlotte-tote-vanilla",
+    "brand": "Michael Kors",
+    "name": "Charlotte Tote Vanilla",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/2503fffb_1-front_(42).webp"
+  },
+  {
+    "file": "Termékek_pt2/1-front (43).webp",
+    "id": "mk-charlotte-tote-barna",
+    "brand": "Michael Kors",
+    "name": "Charlotte Tote Barna",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/713c8964_1-front_(43).webp"
+  },
+  {
+    "file": "Termékek_pt2/1-front (45).webp",
+    "id": "mk-charlotte-saffiano",
+    "brand": "Michael Kors",
+    "name": "Charlotte Saffiano",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/efb95ffb_1-front_(45).webp"
+  },
+  {
+    "file": "Termékek_pt2/1-front (47).webp",
+    "id": "mk-feher-bag",
+    "brand": "Michael Kors",
+    "name": "Fehér Bag",
+    "category": "taska",
+    "size": null,
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/529a1357_1-front_(47).webp"
+  },
+  {
+    "file": "Termékek_pt2/36 2:3.webp",
+    "id": "yeezy-350-carbon",
+    "brand": "Adidas",
+    "name": "Yeezy 350 V2 Carbon",
+    "category": "cipo",
+    "size": "36",
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/102bcdf4_36_2_3.webp"
+  },
+  {
+    "file": "Termékek_pt2/38-38.5-39 .webp",
+    "id": "nike-af1-wheat",
+    "brand": "Nike",
+    "name": "Air Force 1 Wheat",
+    "category": "cipo",
+    "size": "38, 38.5, 39",
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/13e311cf_38-38.5-39_.webp"
+  },
+  {
+    "file": "Termékek_pt2/39-pony hair.webp",
+    "id": "nike-af1-pony-hair",
+    "brand": "Nike",
+    "name": "Air Force 1 Pony Hair",
+    "category": "cipo",
+    "size": "39",
+    "url": "https://ppjvijirnkjuktlmqagx.supabase.co/storage/v1/object/public/products/743daa4b_39-pony_hair.webp"
+  }
+]
